@@ -1,11 +1,21 @@
-// Lead Scraper - Jarvis Chrome Extension v2
-// Content script: detects property pages, extracts data, injects UI
+// Lead Scraper v2.1 - Jarvis Chrome Extension
+// Content script: property extraction + CyberBackgroundCheck auto-fill
 
 (function() {
   'use strict';
 
   const site = detectSite();
   if (!site) return;
+
+  // If on CyberBackgroundCheck, auto-fill and search
+  if (site === 'cyber') {
+    chrome.storage.local.get(['pendingSkipTrace'], (result) => {
+      if (result.pendingSkipTrace) {
+        autoFillSkipTrace(result.pendingSkipTrace);
+      }
+    });
+    return;
+  }
 
   injectButton();
 
@@ -19,71 +29,215 @@
     return null;
   }
 
-  // Auto-fill CyberBackgroundCheck if we're on that page
-  if (site === 'cyber') {
-    chrome.storage.local.get(['pendingSkipTrace'], (result) => {
-      if (result.pendingSkipTrace) {
-        autoFillSkipTrace(result.pendingSkipTrace);
-      }
-    });
-  }
+  // ===== CYBERBACKGROUNDCHECK AUTO-FILL =====
 
   function autoFillSkipTrace(data) {
-    // Wait for page to load
-    setTimeout(() => {
-      const streetField = document.querySelector('input[name="StreetAddress"], input[id*="street"], input[placeholder*="Street"], #StreetAddress, input[name="address"]');
-      const cityField = document.querySelector('input[name="City"], input[id*="city"], input[placeholder*="City"], #City');
-      const stateField = document.querySelector('input[name="State"], input[id*="state"], input[placeholder*="State"], #State, select[name="State"]');
-      const zipField = document.querySelector('input[name="ZipCode"], input[id*="zip"], input[placeholder*="Zip"], #ZipCode');
+    // Wait for page to fully load
+    const maxAttempts = 10;
+    let attempts = 0;
 
+    const tryFill = () => {
+      attempts++;
+      
+      // Find the input fields - try multiple selectors
+      const allInputs = document.querySelectorAll('input[type="text"], input:not([type])');
+      let streetField = null;
+      let cityStateField = null;
+      let zipField = null;
+
+      // Try by name/id first
+      streetField = document.querySelector('#StreetAddress, input[name="StreetAddress"], input[placeholder*="Street"], input[name="street"]');
+      cityStateField = document.querySelector('#CityState, input[name="CityState"], input[placeholder*="City"], input[name="city_state"], input[placeholder*="State"]');
+      zipField = document.querySelector('#ZipCode, input[name="ZipCode"], input[placeholder*="Zip"], input[name="zip"]');
+
+      // Fallback: find by position/order if there are multiple text inputs
+      if (!streetField && allInputs.length >= 2) {
+        streetField = allInputs[0];
+        cityStateField = allInputs[1];
+        if (allInputs.length >= 3) zipField = allInputs[2];
+      }
+
+      if (!streetField && attempts < maxAttempts) {
+        setTimeout(tryFill, 1000);
+        return;
+      }
+
+      // Fill street address
       if (streetField) {
-        streetField.value = data.street || '';
-        streetField.dispatchEvent(new Event('input', { bubbles: true }));
-        streetField.dispatchEvent(new Event('change', { bubbles: true }));
+        setFieldValue(streetField, data.street || '');
       }
-      if (cityField) {
-        cityField.value = data.city || '';
-        cityField.dispatchEvent(new Event('input', { bubbles: true }));
-        cityField.dispatchEvent(new Event('change', { bubbles: true }));
+
+      // Fill city & state combined
+      if (cityStateField) {
+        const cityState = [data.city, data.state].filter(Boolean).join(', ');
+        setFieldValue(cityStateField, cityState);
       }
-      if (stateField) {
-        if (stateField.tagName === 'SELECT') {
-          // Find the option
-          const options = stateField.querySelectorAll('option');
-          options.forEach(opt => {
-            if (opt.value === data.state || opt.textContent.trim().toUpperCase() === (data.state || '').toUpperCase()) {
-              stateField.value = opt.value;
-            }
-          });
-        } else {
-          stateField.value = data.state || '';
-        }
-        stateField.dispatchEvent(new Event('input', { bubbles: true }));
-        stateField.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+
+      // Fill zip
       if (zipField && data.zip) {
-        zipField.value = data.zip || '';
-        zipField.dispatchEvent(new Event('input', { bubbles: true }));
-        zipField.dispatchEvent(new Event('change', { bubbles: true }));
+        setFieldValue(zipField, data.zip);
       }
 
-      // Show toast
-      showCyberToast('✅ Address auto-filled by Jarvis Lead Scraper');
+      // Show success toast
+      showCyberToast(`✅ Auto-filled: ${data.street}, ${data.city}, ${data.state} ${data.zip || ''}`);
 
-      // Clear pending
+      // Click search button after a short delay
+      setTimeout(() => {
+        const searchBtn = document.querySelector('button[type="submit"], input[type="submit"], .search-button, button.btn-primary, button.search, a.search-button');
+        // Try finding any button that says "search" or "find"
+        if (!searchBtn) {
+          const allBtns = document.querySelectorAll('button, input[type="submit"], a.btn');
+          for (const btn of allBtns) {
+            const text = (btn.textContent || btn.value || '').toLowerCase();
+            if (text.includes('search') || text.includes('find') || text.includes('lookup')) {
+              btn.click();
+              showCyberToast('🔍 Searching...');
+              break;
+            }
+          }
+        } else {
+          searchBtn.click();
+          showCyberToast('🔍 Searching...');
+        }
+      }, 500);
+
+      // Clear pending data
       chrome.storage.local.remove(['pendingSkipTrace']);
-    }, 2000);
+    };
+
+    // Start trying after page loads
+    setTimeout(tryFill, 1500);
+  }
+
+  function setFieldValue(field, value) {
+    if (!field || !value) return;
+    
+    // Focus the field
+    field.focus();
+    field.dispatchEvent(new Event('focus', { bubbles: true }));
+    
+    // Clear existing value
+    field.value = '';
+    
+    // Set new value using native input setter (bypasses React/Vue)
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+    nativeInputValueSetter.call(field, value);
+    
+    // Trigger all events
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+    field.dispatchEvent(new Event('change', { bubbles: true }));
+    field.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true }));
+    
+    // Blur
+    field.blur();
   }
 
   function showCyberToast(msg) {
+    // Remove existing toast
+    const existing = document.getElementById('jarvis-cyber-toast');
+    if (existing) existing.remove();
+
     const toast = document.createElement('div');
-    toast.style.cssText = 'position:fixed;top:20px;right:20px;z-index:999999;background:#14532d;color:#86efac;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.3);border:1px solid #22c55e;';
+    toast.id = 'jarvis-cyber-toast';
+    toast.style.cssText = 'position:fixed;top:20px;right:20px;z-index:999999;background:#14532d;color:#86efac;padding:14px 22px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.4);border:1px solid #22c55e;font-family:-apple-system,sans-serif;';
     toast.textContent = msg;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 5000);
+    setTimeout(() => toast.remove(), 6000);
   }
 
-  // ===== EXTRACTORS =====
+  // ===== ADDRESS PARSER =====
+
+  function parseAddress(fullAddr) {
+    if (!fullAddr) return { street: '', city: '', state: '', zip: '', cityState: '' };
+    
+    let cleaned = fullAddr.replace(/\s+/g, ' ').trim();
+    
+    // Try comma-separated parsing first
+    const parts = cleaned.split(',').map(p => p.trim());
+    
+    let street = '', city = '', state = '', zip = '';
+    
+    if (parts.length >= 3) {
+      // "123 Main St, York, PA 17401"
+      street = parts[0];
+      city = parts[1];
+      const stateZip = parts[2].split(/\s+/);
+      state = stateZip[0] || '';
+      zip = stateZip[1] || '';
+    } else if (parts.length === 2) {
+      // "123 Main St, York PA 17401" or "123 Main St, PA"
+      street = parts[0];
+      const remainder = parts[1].split(/\s+/);
+      // Try to detect if last word is a state abbreviation (2 letters)
+      const lastWord = remainder[remainder.length - 1] || '';
+      const secondLast = remainder[remainder.length - 2] || '';
+      
+      if (/^\d{5}(-\d{4})?$/.test(lastWord)) {
+        // Last word is zip
+        zip = lastWord;
+        if (/^[A-Z]{2}$/i.test(secondLast)) {
+          // Second last is state
+          state = secondLast.toUpperCase();
+          city = remainder.slice(0, -2).join(' ');
+        } else {
+          city = remainder.slice(0, -1).join(' ');
+        }
+      } else if (/^[A-Z]{2}$/i.test(lastWord)) {
+        // Last word is state
+        state = lastWord.toUpperCase();
+        city = remainder.slice(0, -1).join(' ');
+      } else {
+        city = parts[1];
+      }
+    } else {
+      // Single string: "2245 Sutton Rd York PA 17402"
+      // Try to find the state abbreviation
+      const words = cleaned.split(/\s+/);
+      
+      // Look for 2-letter state code
+      let stateIdx = -1;
+      for (let i = 0; i < words.length; i++) {
+        if (/^[A-Z]{2}$/i.test(words[i]) && i > 0) {
+          stateIdx = i;
+          break;
+        }
+      }
+      
+      if (stateIdx > 0) {
+        state = words[stateIdx].toUpperCase();
+        // Check if next word is zip
+        if (/^\d{5}(-\d{4})?$/.test(words[stateIdx + 1] || '')) {
+          zip = words[stateIdx + 1];
+        }
+        // Everything before state is street + city
+        const beforeState = words.slice(0, stateIdx);
+        // Heuristic: city is usually the last word before state
+        if (beforeState.length >= 2) {
+          city = beforeState[beforeState.length - 1];
+          street = beforeState.slice(0, -1).join(' ');
+        } else {
+          street = beforeState.join(' ');
+        }
+      } else {
+        // No state found - just use the whole thing as street
+        // But check if last word could be a city name
+        const knownCities = ['york', 'hanover', 'lancaster', 'harrisburg', 'dover', 'red lion', 'dillsburg', 'wrightsville', 'spring grove', 'thomasville', 'glen rock', 'seven valleys', 'new freedom', 'lewisberry', 'etters', 'dallastown', 'carlisle', 'lansdale'];
+        const lastWordLower = (words[words.length - 1] || '').toLowerCase();
+        
+        if (knownCities.includes(lastWordLower)) {
+          city = words[words.length - 1];
+          street = words.slice(0, -1).join(' ');
+        } else {
+          street = cleaned;
+        }
+      }
+    }
+    
+    const cityState = [city, state].filter(Boolean).join(', ');
+    return { street, city, state, zip, cityState, full: cleaned };
+  }
+
+  // ===== PROPERTY EXTRACTORS =====
 
   function extractData() {
     const hostname = window.location.hostname;
@@ -92,40 +246,6 @@
     if (hostname.includes('homes.com')) return extractHomes();
     if (hostname.includes('trulia.com')) return extractTrulia();
     return null;
-  }
-
-  function parseAddress(fullAddr) {
-    if (!fullAddr) return { street: '', city: '', state: '', zip: '', full: '' };
-    
-    // Clean up
-    const cleaned = fullAddr.replace(/\s+/g, ' ').trim();
-    
-    // Try to parse: "123 Main St, York, PA 17401"
-    const parts = cleaned.split(',').map(p => p.trim());
-    
-    let street = '', city = '', state = '', zip = '';
-    
-    if (parts.length >= 3) {
-      street = parts[0];
-      city = parts[1];
-      const stateZip = parts[2].split(/\s+/);
-      state = stateZip[0] || '';
-      zip = stateZip[1] || '';
-    } else if (parts.length === 2) {
-      street = parts[0];
-      const cityStateZip = parts[1].split(/\s+/);
-      if (cityStateZip.length >= 3) {
-        city = cityStateZip.slice(0, -2).join(' ');
-        state = cityStateZip[cityStateZip.length - 2];
-        zip = cityStateZip[cityStateZip.length - 1];
-      } else {
-        city = parts[1];
-      }
-    } else {
-      street = cleaned;
-    }
-    
-    return { street, city, state, zip, full: cleaned };
   }
 
   function extractPropwire() {
@@ -177,7 +297,7 @@
     return data;
   }
 
-  // ===== INJECT UI =====
+  // ===== INJECT FLOATING BUTTON =====
 
   function injectButton() {
     const btn = document.createElement('div');
@@ -198,33 +318,29 @@
         return;
       }
 
-      showToast('⏳ Extracting lead data...', 'info');
+      showToast('⏳ Extracting lead + opening skip trace...', 'info');
 
-      // Parse address for skip trace
+      // Parse address
       const parsed = parseAddress(data.address);
       data.parsedAddress = parsed;
 
       // Store for CyberBackgroundCheck auto-fill
-      const skipData = {
-        street: parsed.street,
-        city: parsed.city,
-        state: parsed.state,
-        zip: parsed.zip
-      };
+      chrome.storage.local.set({ 
+        pendingSkipTrace: {
+          street: parsed.street,
+          city: parsed.city,
+          state: parsed.state,
+          zip: parsed.zip
+        }
+      });
 
-      // Build CyberBackgroundCheck URL
-      const cyberUrl = `https://www.cyberbackgroundchecks.com/address`;
-
-      // Store pending skip trace for auto-fill
-      chrome.storage.local.set({ pendingSkipTrace: skipData });
-
-      // Open CyberBackgroundCheck
-      window.open(cyberUrl, '_blank');
+      // Open CyberBackgroundCheck address page
+      window.open('https://www.cyberbackgroundchecks.com/address', '_blank');
 
       // Save lead
       data.extractedAt = new Date().toISOString();
-      data.skipTraceUrl = cyberUrl;
-      data.parsed = parsed;
+      data.skipTraceUrl = 'https://www.cyberbackgroundchecks.com/address';
+      
       const leads = (await getStoredLeads()) || [];
       leads.push(data);
       chrome.storage.local.set({ pendingLeads: leads });
@@ -232,7 +348,7 @@
       // Send to background for Sheets push
       chrome.runtime.sendMessage({ action: 'addLead', data: data });
 
-      showToast(`✅ Lead added: ${parsed.street}, ${parsed.city} ${parsed.state}`, 'success');
+      showToast(`✅ Lead added: ${parsed.street}, ${parsed.cityState}`, 'success');
       btn.innerHTML = '✅ Added!';
       btn.style.background = '#22c55e';
       setTimeout(() => {
