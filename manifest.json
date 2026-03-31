@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Lead Scraper - Jarvis",
-  "version": "1.0",
-  "description": "One-click lead capture from PropWire, Zillow, Homes.com, Trulia. Auto-skip trace via CyberBackgroundCheck. Pushes to Google Sheets.",
+  "version": "2.0",
+  "description": "One-click lead capture from PropWire, Zillow, Homes.com, Trulia. Auto-skip trace via CyberBackgroundCheck. Push to Google Sheets.",
   "permissions": [
     "activeTab",
     "tabs",
@@ -39,7 +39,8 @@
         "https://*.propwire.com/*",
         "https://*.zillow.com/*",
         "https://*.homes.com/*",
-        "https://*.trulia.com/*"
+        "https://*.trulia.com/*",
+        "https://*.cyberbackgroundchecks.com/*"
       ],
       "js": ["content.js"],
       "css": ["styles.css"]
