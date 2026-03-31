@@ -1,0 +1,44 @@
+/* Lead Scraper - Jarvis Chrome Extension */
+/* Floating button and toast styles */
+
+#jarvis-lead-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999999;
+  background: #3b82f6;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  transition: all 0.3s ease;
+  user-select: none;
+  border: none;
+}
+
+#jarvis-lead-btn:hover {
+  background: #2563eb;
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.5);
+  transform: translateY(-2px);
+}
+
+#jarvis-toast {
+  position: fixed;
+  bottom: 80px;
+  right: 24px;
+  z-index: 999999;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.jarvis-toast-info { background: #1e3a5f; color: #93c5fd; border: 1px solid #3b82f6; }
+.jarvis-toast-success { background: #14532d; color: #86efac; border: 1px solid #22c55e; }
+.jarvis-toast-error { background: #450a0a; color: #fca5a5; border: 1px solid #ef4444; }

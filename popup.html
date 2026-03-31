@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 360px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; }
+    .header { background: linear-gradient(135deg, #1e3a5f, #3b82f6); padding: 16px; text-align: center; }
+    .header h1 { font-size: 18px; font-weight: 700; color: white; }
+    .header p { font-size: 12px; color: #93c5fd; margin-top: 4px; }
+    .stats { display: flex; justify-content: space-around; padding: 12px; background: #1e293b; border-bottom: 1px solid #334155; }
+    .stat { text-align: center; }
+    .stat-num { font-size: 24px; font-weight: 700; color: #3b82f6; }
+    .stat-label { font-size: 11px; color: #94a3b8; }
+    .actions { padding: 12px; }
+    .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 8px; transition: all 0.2s; }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-success { background: #22c55e; color: white; }
+    .btn-success:hover { background: #16a34a; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-outline { background: transparent; border: 1px solid #475569; color: #e2e8f0; }
+    .btn-outline:hover { background: #1e293b; }
+    .settings { padding: 12px; border-top: 1px solid #334155; }
+    .settings label { font-size: 12px; color: #94a3b8; display: block; margin-bottom: 4px; }
+    .settings input { width: 100%; padding: 8px; border: 1px solid #475569; border-radius: 6px; background: #1e293b; color: #e2e8f0; font-size: 13px; }
+    .footer { padding: 8px 12px; text-align: center; font-size: 11px; color: #64748b; border-top: 1px solid #334155; }
+    .lead-list { max-height: 200px; overflow-y: auto; padding: 8px 12px; }
+    .lead-item { padding: 8px; background: #1e293b; border-radius: 6px; margin-bottom: 4px; font-size: 12px; }
+    .lead-addr { color: #e2e8f0; font-weight: 600; }
+    .lead-meta { color: #94a3b8; margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🛠️ Lead Scraper</h1>
+    <p>Powered by Jarvis — One-click leads</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num" id="leadCount">0</div>
+      <div class="stat-label">Pending Leads</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="todayCount">0</div>
+      <div class="stat-label">Added Today</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="skipTraceBtn">🔍 Skip Trace Current Page</button>
+    <button class="btn btn-success" id="exportBtn">📊 Export CSV</button>
+    <button class="btn btn-outline" id="viewLeadsBtn">📋 View Pending Leads</button>
+    <button class="btn btn-danger" id="clearBtn">🗑️ Clear All Leads</button>
+  </div>
+
+  <div class="lead-list" id="leadList" style="display: none;"></div>
+
+  <div class="settings">
+    <label>Google Sheet ID (for direct push):</label>
+    <input type="text" id="sheetId" placeholder="1GjB4P5SKiMoZDrlkuOvgetpynYhE0yTPFm-R56NLZhg">
+  </div>
+
+  <div class="footer">
+    Jarvis Lead Scraper v1.0 — Works on PropWire, Zillow, Homes.com, Trulia
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
