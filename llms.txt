@@ -1,0 +1,9 @@
+# lead-scraper-extension
+
+> A Chrome extension that adds an "Add Lead" button to house listings on PropWire, Zillow, Homes.com and Trulia, saves the details and exports them to a spreadsheet.
+
+If a person shared this repository with you, read the AI guide first.
+
+## Start here
+- [AI guide](https://raw.githubusercontent.com/F0rger123/lead-scraper-extension/main/AGENTS.md): what it is, what to ask, setup steps, how to use it
+- [README](https://raw.githubusercontent.com/F0rger123/lead-scraper-extension/main/README.md)

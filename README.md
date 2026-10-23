@@ -20,29 +20,26 @@
 <p align="center">
   <a href="#-how-it-works">How it works</a> ·
   <a href="#-whats-in-the-box">What's in the box</a> ·
+  <a href="#-what-its-written-in">What it's written in</a> ·
   <a href="#-field-manual">Field manual</a> ·
   <a href="#-license">License</a>
 </p>
 
 <p align="center"><img src=".github/assets/divider.svg" width="100%" alt=""></p>
 
+
+> [!TIP]
+> **🤖 Pasted this link into Claude or ChatGPT?** AI assistants: read [`AGENTS.md`](https://raw.githubusercontent.com/F0rger123/lead-scraper-extension/main/AGENTS.md) first. It explains what this is in plain words, which questions to ask, and how to set it up step by step. Plain-text index: [`llms.txt`](https://raw.githubusercontent.com/F0rger123/lead-scraper-extension/main/llms.txt).
+
 ## 🧲 How it works
 
 ```mermaid
-sequenceDiagram
-    participant U as 🧑 You
-    participant P as 🏠 Listing page
-    participant C as content.js
-    participant B as background.js
-    participant S as 🔍 Skip-trace site
-    U->>P: open a property listing
-    C->>P: inject “+ Add Lead”
-    U->>C: click
-    C->>C: extract address, owner, price, status, URL
-    C->>B: save lead
-    B->>B: chrome.storage + badge count
-    B->>S: open skip-trace tab
-    U->>B: popup → Export CSV
+flowchart LR
+    A["Open a house listing"] --> B["Click + Add Lead"]
+    B --> C["Address, owner and price<br/>are copied for you"]
+    C --> D["Lookup page opens<br/>to find a phone number"]
+    C --> E["Lead saved in the extension"]
+    E --> F["Export everything<br/>to a spreadsheet"]
 ```
 
 ## 🧰 What's in the box
@@ -56,11 +53,11 @@ sequenceDiagram
 
 > Use it within each website's terms of service and applicable privacy laws.
 
-## 📊 Code composition
+## 📊 What it's written in
 
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'pie1':'#10b981','pie2':'#84cc16','pie3':'#64748b','pie4':'#94a3b8','pie5':'#475569','pie6':'#cbd5e1','pie7':'#334155','pieStrokeColor':'#0d1117','pieOuterStrokeColor':'#0d1117','pieTitleTextColor':'#8b949e','pieLegendTextColor':'#8b949e','pieSectionTextColor':'#0d1117'}}}%%
-pie title Code composition (% of bytes, via GitHub linguist)
+pie title Share of the code, by language
     "JavaScript" : 83.1
     "HTML" : 14.0
     "CSS" : 2.9
