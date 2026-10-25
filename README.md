@@ -25,15 +25,16 @@
   <a href="#-license">License</a>
 </p>
 
-<p align="center"><img src=".github/assets/divider.svg" width="100%" alt=""></p>
-
-
 > [!TIP]
 > **🤖 Pasted this link into Claude or ChatGPT?** AI assistants: read [`AGENTS.md`](https://raw.githubusercontent.com/F0rger123/lead-scraper-extension/main/AGENTS.md) first. It explains what this is in plain words, which questions to ask, and how to set it up step by step. Plain-text index: [`llms.txt`](https://raw.githubusercontent.com/F0rger123/lead-scraper-extension/main/llms.txt).
+
+
+<p align="center"><img src=".github/assets/divider.svg" width="100%" alt=""></p>
 
 ## 🧲 How it works
 
 ```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#0d1117','primaryTextColor':'#e6edf3','primaryBorderColor':'#10b981','lineColor':'#84cc16','secondaryColor':'#161b22','tertiaryColor':'#0d1117','clusterBkg':'transparent','clusterBorder':'#10b981','noteBkgColor':'#161b22','noteTextColor':'#e6edf3','actorBkg':'#0d1117','actorTextColor':'#e6edf3','actorBorder':'#10b981','signalColor':'#84cc16','signalTextColor':'#84cc16','labelBoxBkgColor':'#0d1117','fontFamily':'inherit'}}}%%
 flowchart LR
     A["Open a house listing"] --> B["Click + Add Lead"]
     B --> C["Address, owner and price<br/>are copied for you"]
