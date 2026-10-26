@@ -1,12 +1,12 @@
 <p align="center">
-  <img src=".github/assets/banner.svg" alt="LEAD SCRAPER: One-click real-estate lead capture, right in Chrome." width="100%">
+  <img src=".github/assets/banner.svg" alt="Lead Scraper: One-click real-estate lead capture, right in Chrome." width="100%">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/status-public-10b981?style=for-the-badge" alt="Public">
-  <img src="https://img.shields.io/badge/license-MIT-10b981?style=for-the-badge" alt="License">
-  <img src="https://img.shields.io/github/last-commit/F0rger123/lead-scraper-extension?style=for-the-badge&color=10b981" alt="Last commit">
-  <img src="https://img.shields.io/github/repo-size/F0rger123/lead-scraper-extension?style=for-the-badge&color=10b981" alt="Repo size">
+  <img src="https://img.shields.io/badge/status-public-1e293b?style=for-the-badge" alt="Public">
+  <img src="https://img.shields.io/badge/license-MIT-1e293b?style=for-the-badge" alt="License">
+  <img src="https://img.shields.io/github/last-commit/F0rger123/lead-scraper-extension?style=for-the-badge&color=1e293b" alt="Last commit">
+  <img src="https://img.shields.io/github/repo-size/F0rger123/lead-scraper-extension?style=for-the-badge&color=1e293b" alt="Repo size">
 </p>
 <p align="center">
   <img src="https://img.shields.io/badge/Chrome%20MV3-0d1117?style=flat-square&logo=googlechrome&logoColor=white" alt="Chrome MV3">
@@ -18,11 +18,18 @@
 <h3 align="center">A floating “Add Lead” button on PropWire, Zillow, Homes.com and Trulia listings. One click captures the property and opens a skip trace.</h3>
 
 <p align="center">
-  <a href="#-how-it-works">How it works</a> ·
-  <a href="#-whats-in-the-box">What's in the box</a> ·
-  <a href="#-what-its-written-in">What it's written in</a> ·
-  <a href="#-field-manual">Field manual</a> ·
-  <a href="#-license">License</a>
+  <a href="#step-1--browse-click-captured">Step 1 · Browse, click, captured</a> ·
+  <a href="#step-2--whats-in-the-extension">Step 2 · What's in the extension</a> ·
+  <a href="#step-3--built-with">Step 3 · Built with</a> ·
+  <a href="#step-4--field-manual">Step 4 · Field manual</a> ·
+  <a href="#supported-sites">Supported Sites</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#installation">Installation</a> ·
+  <a href="#how-to-use">How to Use</a> ·
+  <a href="#export-to-google-sheets">Export to Google Sheets</a> ·
+  <a href="#coming-soon">Coming Soon</a> ·
+  <a href="#step-4--field-manual">Step 4 · Field manual</a> ·
+  <a href="#license">License</a>
 </p>
 
 > [!TIP]
@@ -31,10 +38,10 @@
 
 <p align="center"><img src=".github/assets/divider.svg" width="100%" alt=""></p>
 
-## 🧲 How it works
+## Step 1 · Browse, click, captured
 
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#0d1117','primaryTextColor':'#e6edf3','primaryBorderColor':'#10b981','lineColor':'#84cc16','secondaryColor':'#161b22','tertiaryColor':'#0d1117','clusterBkg':'transparent','clusterBorder':'#10b981','noteBkgColor':'#161b22','noteTextColor':'#e6edf3','actorBkg':'#0d1117','actorTextColor':'#e6edf3','actorBorder':'#10b981','signalColor':'#84cc16','signalTextColor':'#84cc16','labelBoxBkgColor':'#0d1117','fontFamily':'inherit'}}}%%
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#1e293b','primaryTextColor':'#e2e8f0','primaryBorderColor':'#3b82f6','lineColor':'#94a3b8','secondaryColor':'#0f172a','tertiaryColor':'#334155','clusterBkg':'transparent','clusterBorder':'#3b82f6','noteBkgColor':'#0f172a','noteTextColor':'#e2e8f0','actorBkg':'#1e293b','actorTextColor':'#e2e8f0','actorBorder':'#3b82f6','signalColor':'#94a3b8','signalTextColor':'#94a3b8','labelBoxBkgColor':'#1e293b','fontFamily':'inherit'}}}%%
 flowchart LR
     A["Open a house listing"] --> B["Click + Add Lead"]
     B --> C["Address, owner and price<br/>are copied for you"]
@@ -43,7 +50,9 @@ flowchart LR
     E --> F["Export everything<br/>to a spreadsheet"]
 ```
 
-## 🧰 What's in the box
+## Step 2 · What's in the extension
+
+<img align="right" width="260" src=".github/assets/screens/popup.jpg" alt="The Lead Scraper popup: pending and today counts, push to Google Sheet, export CSV">
 
 | File | Role |
 |---|---|
@@ -54,10 +63,12 @@ flowchart LR
 
 > Use it within each website's terms of service and applicable privacy laws.
 
-## 📊 What it's written in
+<br clear="right">
+
+## Step 3 · Built with
 
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'pie1':'#10b981','pie2':'#84cc16','pie3':'#64748b','pie4':'#94a3b8','pie5':'#475569','pie6':'#cbd5e1','pie7':'#334155','pieStrokeColor':'#0d1117','pieOuterStrokeColor':'#0d1117','pieTitleTextColor':'#8b949e','pieLegendTextColor':'#8b949e','pieSectionTextColor':'#0d1117'}}}%%
+%%{init: {'theme':'base','themeVariables':{'pie1':'#3b82f6','pie2':'#22c55e','pie3':'#64748b','pie4':'#94a3b8','pie5':'#475569','pie6':'#cbd5e1','pie7':'#334155','pieStrokeColor':'#0d1117','pieOuterStrokeColor':'#0d1117','pieTitleTextColor':'#8b949e','pieLegendTextColor':'#8b949e','pieSectionTextColor':'#0d1117'}}}%%
 pie title Share of the code, by language
     "JavaScript" : 83.1
     "HTML" : 14.0
@@ -66,7 +77,7 @@ pie title Share of the code, by language
 
 <p align="center"><img src=".github/assets/divider.svg" width="100%" alt=""></p>
 
-## 📚 Field manual
+## Step 4 · Field manual
 
 One-click lead capture from real estate websites. Auto-skip trace via CyberBackgroundCheck.
 
@@ -116,7 +127,7 @@ One-click lead capture from real estate websites. Auto-skip trace via CyberBackg
 - Bulk lead import from search result pages
 - Jarvis AI integration (auto-scripts, follow-up reminders)
 
-## 📜 License
+## License
 
 Released under the [MIT License](LICENSE). Use it, fork it, ship it.
 
